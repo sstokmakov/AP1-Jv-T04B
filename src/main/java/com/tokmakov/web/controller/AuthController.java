@@ -1,6 +1,6 @@
 package com.tokmakov.web.controller;
 
-import com.tokmakov.domain.auth.AuthService;
+import com.tokmakov.security.AuthService;
 import com.tokmakov.web.model.SignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

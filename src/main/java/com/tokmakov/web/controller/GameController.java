@@ -1,7 +1,7 @@
 package com.tokmakov.web.controller;
 
 import com.tokmakov.domain.model.Game;
-import com.tokmakov.domain.auth.AppUserDetails;
+import com.tokmakov.security.AppUserDetails;
 import com.tokmakov.domain.service.GameService;
 import com.tokmakov.web.mapper.GameDtoMapper;
 import com.tokmakov.web.model.GameDto;

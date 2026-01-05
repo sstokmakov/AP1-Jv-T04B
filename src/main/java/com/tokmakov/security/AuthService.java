@@ -1,4 +1,4 @@
-package com.tokmakov.domain.auth;
+package com.tokmakov.security;
 
 import com.tokmakov.domain.model.User;
 import com.tokmakov.domain.service.UserService;

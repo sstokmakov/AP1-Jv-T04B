@@ -1,4 +1,4 @@
-package com.tokmakov.config;
+package com.tokmakov.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

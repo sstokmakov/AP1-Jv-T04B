@@ -1,4 +1,4 @@
-package com.tokmakov.domain.auth;
+package com.tokmakov.security;
 
 import lombok.Builder;
 import lombok.Getter;
