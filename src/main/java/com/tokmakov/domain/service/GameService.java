@@ -2,6 +2,8 @@ package com.tokmakov.domain.service;
 
 import com.tokmakov.domain.model.Game;
 
+import java.util.List;
+
 public interface GameService {
     Game createGameWithPlayer(String playerUuid);
 
@@ -9,7 +11,7 @@ public interface GameService {
 
     Game joinGame(String gameUuid, String playerUuid);
 
-    Iterable<Game> availableGames();
+    List<String> availableGames(String userUuid);
 
     Game gameByUuid(String uuid);
 

@@ -1,6 +1,8 @@
 package com.tokmakov.domain.service;
 
-import com.tokmakov.datasource.GameRepository;
+import com.tokmakov.datasource.game.GameEntity;
+import com.tokmakov.datasource.game.GameEntityMapper;
+import com.tokmakov.datasource.game.GameRepository;
 import com.tokmakov.domain.exception.*;
 import com.tokmakov.domain.model.Game;
 import com.tokmakov.domain.model.GameStatus;
@@ -9,6 +11,8 @@ import com.tokmakov.domain.service.util.GameUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,13 +29,12 @@ public class GameServiceImpl implements GameService {
     public Game createGameWithPlayer(String playerUuid) {
         int[][] field = GameUtils.createEmptyField();
         Game game = new Game(UUID.randomUUID(), field);
-
         game.setPlayerXUuid(UUID.fromString(playerUuid));
         game.setPlayerOUuid(null);
         game.setVsComputer(false);
         game.setGameStatus(GameStatus.WAITING_FOR_PLAYERS);
         game.setCurrentTurnPlayerUuid(null);
-        repository.save(game);
+        repository.save(GameEntityMapper.toGameEntity(game));
         return game;
     }
 
@@ -44,7 +47,7 @@ public class GameServiceImpl implements GameService {
         game.setVsComputer(true);
         game.setGameStatus(GameStatus.IN_PROGRESS);
         game.setCurrentTurnPlayerUuid(UUID.fromString(playerUuid));
-        repository.save(game);
+        repository.save(GameEntityMapper.toGameEntity(game));
         return game;
     }
 
@@ -63,13 +66,20 @@ public class GameServiceImpl implements GameService {
         game.setPlayerOUuid(UUID.fromString(playerUuid));
         game.setGameStatus(GameStatus.IN_PROGRESS);
         game.setCurrentTurnPlayerUuid(game.getPlayerXUuid());
-        repository.save(game);
+        repository.save(GameEntityMapper.toGameEntity(game));
         return game;
     }
 
     @Override
-    public Iterable<Game> availableGames() {
-        return repository.findByGameStatus(GameStatus.WAITING_FOR_PLAYERS);
+        public List<String> availableGames(String userUuid) {
+        Iterable<GameEntity> entities = repository.findByGameStatus(GameStatus.WAITING_FOR_PLAYERS);
+        List<String> uuids = new ArrayList<>();
+        for (GameEntity entity : entities) {
+            if (String.valueOf(entity.getUuid()).equals(userUuid))
+                continue;
+            uuids.add(String.valueOf(entity.getUuid()));
+        }
+        return uuids;
     }
 
     @Override
@@ -119,7 +129,7 @@ public class GameServiceImpl implements GameService {
     private void applyMove(Game game, int x, int y, int value) {
         fieldValidator.validateTurn(game, x, y);
         game.updateField(x, y, value);
-        repository.save(game);
+        repository.save(GameEntityMapper.toGameEntity(game));
     }
 
     private void updateGameState(Game game) {
@@ -128,21 +138,21 @@ public class GameServiceImpl implements GameService {
             game.setGameStatus(GameStatus.GAME_OVER);
             game.setWinnerUuid(resolveWinnerUuid(game, winnerCell));
             game.setCurrentTurnPlayerUuid(null);
-            repository.save(game);
+            repository.save(GameEntityMapper.toGameEntity(game));
             return;
         }
         if (GameUtils.isBoardFull(game.getGameField())) {
             game.setGameStatus(GameStatus.GAME_OVER);
             game.setWinnerUuid(null);
             game.setCurrentTurnPlayerUuid(null);
-            repository.save(game);
+            repository.save(GameEntityMapper.toGameEntity(game));
             return;
         }
 
         UUID nextPlayer = nextTurnPlayer(game);
         game.setGameStatus(GameStatus.IN_PROGRESS);
         game.setCurrentTurnPlayerUuid(nextPlayer);
-        repository.save(game);
+        repository.save(GameEntityMapper.toGameEntity(game));
     }
 
     private UUID resolveWinnerUuid(Game game, int winnerCell) {
@@ -167,7 +177,8 @@ public class GameServiceImpl implements GameService {
 
     private Game getGameByUuid(String uuid) {
         UUID parsedUuid = UUID.fromString(uuid);
-        Optional<Game> game = repository.findById(parsedUuid);
-        return game.orElseThrow(() -> new GameNotFoundException(uuid));
+        Optional<GameEntity> game = repository.findById(parsedUuid);
+        GameEntity entity = game.orElseThrow(() -> new GameNotFoundException(uuid));
+        return GameEntityMapper.toGame(entity);
     }
 }

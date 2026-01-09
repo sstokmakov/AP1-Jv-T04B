@@ -1,4 +1,4 @@
-package com.tokmakov.datasource;
+package com.tokmakov.datasource.game;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

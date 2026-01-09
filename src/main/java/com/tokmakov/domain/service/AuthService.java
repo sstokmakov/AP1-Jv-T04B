@@ -1,7 +1,7 @@
-package com.tokmakov.security;
+package com.tokmakov.domain.service;
 
 import com.tokmakov.domain.model.User;
-import com.tokmakov.domain.service.UserService;
+import com.tokmakov.security.AppUserDetails;
 import com.tokmakov.web.model.SignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

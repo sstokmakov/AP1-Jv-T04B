@@ -13,7 +13,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Validated
@@ -34,12 +33,8 @@ public class GameController {
     }
 
     @GetMapping("/available")
-    public List<GameDto> availableGames() {
-        List<GameDto> result = new ArrayList<>();
-        for (Game game : service.availableGames()) {
-            result.add(mapper.toDto(game));
-        }
-        return result;
+    public List<String> availableGames(@AuthenticationPrincipal AppUserDetails user) {
+        return service.availableGames(String.valueOf(user.getUuid()));
     }
 
     @PostMapping("/{uuid}/join")
